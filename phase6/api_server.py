@@ -30,7 +30,8 @@ app.add_middleware(
 )
 
 # Mount static files
-frontend_path = os.path.abspath("frontend")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+frontend_path = os.path.join(BASE_DIR, "frontend")
 if not os.path.exists(frontend_path):
     os.makedirs(frontend_path, exist_ok=True)
 app.mount("/static", StaticFiles(directory=frontend_path), name="static")
