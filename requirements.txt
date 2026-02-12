@@ -1,0 +1,7 @@
+datasets
+groq
+python-dotenv
+rich
+fastapi
+uvicorn[standard]
+httpx
