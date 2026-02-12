@@ -1,7 +1,21 @@
 import os
 import sys
 
-# Ensure the root directory is in the python path so modules like 'phase2', 'phase6' can be imported
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+# Standardize path handling so internal modules are discoverable by Vercel
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
 
-from phase6.api_server import app
+# Importing our pre-built FastAPI application from phase6
+# This keeps your business logic reusable and independent of the entrypoint.
+try:
+    from phase6.api_server import app
+except ImportError as e:
+    # Fallback to a minimal app if imports fail, to help debug on Vercel
+    from fastapi import FastAPI
+    app = FastAPI()
+    @app.get("/api/health")
+    def health():
+        return {"status": "error", "message": f"Import failed: {str(e)}", "path": sys.path}
+
+# Vercel looks for 'app' in this file.
