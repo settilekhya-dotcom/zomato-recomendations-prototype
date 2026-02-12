@@ -3,5 +3,8 @@ groq
 python-dotenv
 rich
 fastapi
-uvicorn[standard]
+uvicorn
 httpx
+pydantic
+pydantic-settings
+jinja2
