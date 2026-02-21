@@ -24,35 +24,22 @@ graph TD
     A[Phase 1: Data Input] --> B[Phase 2: User Input]
     B --> C[Phase 3: Integration]
     C --> D[Phase 4: Recommendation]
-    D --> E[Phase 5: Display]
+    D --> E[Phase 5: Display & Feedback]
+    E --> F[Phase 6: API Layer]
     
     A1[Load Dataset] --> A2[Data Cleaning]
-    A2 --> A3[Feature Engineering]
-    A3 --> A4[Store in Database]
+    A2 --> A3[Store in SQLite]
     
-    B1[Web UI - HTML/CSS/JS] --> B2[Input Validation]
-    B2 --> B3[Parameter Extraction]
+    B1[Input Validation] --> B2[Pydantic Models]
     
-    C1[Query Processing] --> C2[Filter by Locality]
-    C2 --> C3[Filter by Price]
-    C3 --> C4[Prepare Dataset]
+    C1[Query Processing] --> C2[Recommendation Engine]
     
-    D1[Feature Vectorization] --> D2[Similarity Computation]
-    D2 --> D3[Ranking Algorithm]
-    D3 --> D4[Top-N Selection]
+    D1[Groq LLM Integration] --> D2[AI Reasoning]
     
-    E1[API Responses] --> E2[Zomato Glassmorphism UI]
-    E2 --> E3[AI Reasoning Reasoning]
+    E1[Streamlit UI] --> E3[User Feedback]
+    E2[FastAPI/HTML UI] --> E3
     
-    F1[FastAPI Server] --> F2[Groq LLM Integration]
-    F2 --> F3[Lucide Icons]
-    
-    A --> A1
-    B --> B1
-    C --> C1
-    D --> D1
-    E --> E1
-    F --> F1
+    F1[FastAPI Server] --> F2[REST Endpoints]
 ```
 
 ---
@@ -105,19 +92,22 @@ zomato-2/
 
 | Component | Technology |
 |-----------|-----------|
-| **Language** | Python 3.8+ |
+| **Language** | Python 3.9+ |
+| **UIs** | Streamlit, Vanilla JS/HTML5 |
 | **Backend** | FastAPI / Uvicorn |
-| **Frontend** | Vanilla JS / CSS (Glassmorphism) |
-| **AI/LLM** | Groq (Llama-3) |
-| **Data Processing** | pandas, numpy |
+| **AI/LLM** | Groq (Llama-3.3-70b) |
+| **Data Processing** | pandas, datasets |
 | **Database** | SQLite |
-| **Aesthetics** | Lucide Icons, Google Fonts |
+| **Styling** | Glassmorphism CSS, Lucide Icons |
 
 ---
 
-## How to Run
+### Streamlit Dashboard (Recommended)
+```bash
+streamlit run streamlit_app.py
+```
 
-### Web Application
+### FastAPI Web Application
 ```bash
 python main.py
 ```
