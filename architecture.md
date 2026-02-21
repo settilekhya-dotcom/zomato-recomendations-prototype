@@ -81,6 +81,9 @@ zomato-2/
 ├── phase3/                     # Filtering engine
 ├── phase4/                     # AI Recommender & Groq integration
 ├── phase6/                     # FastAPI Server logic
+├── streamlit_dashboard/        # Main UI logic & config
+│   ├── app.py
+│   └── .streamlit/
 ├── main.py                     # Project entry point (Uvicorn)
 ├── requirements.txt            # Python dependencies
 └── architecture.md             # System documentation
@@ -104,7 +107,7 @@ zomato-2/
 
 ### Streamlit Dashboard (Recommended)
 ```bash
-streamlit run streamlit_app.py
+python -m streamlit run streamlit_dashboard/app.py
 ```
 
 ### FastAPI Web Application

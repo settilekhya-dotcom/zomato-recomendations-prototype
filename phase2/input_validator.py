@@ -48,6 +48,14 @@ class InputValidator:
             self.available_cities = []
             self.available_cuisines = []
             
+    def get_valid_localities(self) -> List[str]:
+        """Returns the list of available localities (cities)."""
+        return self.available_cities
+
+    def get_valid_cuisines(self) -> List[str]:
+        """Returns the list of available cuisines."""
+        return self.available_cuisines
+            
     def validate_city(self, city: str) -> Tuple[bool, Optional[str], List[str]]:
         """
         Check if a city exists in the database.

@@ -13,6 +13,9 @@ if BASE_DIR not in sys.path:
 from phase2.input_validator import InputValidator
 from phase2.models import UserInput
 from phase4.recommender import LLMRecommender
+from phase5.feedback_collector import FeedbackCollector
+from phase1.main import Phase1Pipeline
+from phase1.config import DATABASE_PATH
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -32,14 +35,16 @@ GLASS_CSS = """
 
     :root {
         --primary: #FF385C;
-        --primary-dark: #D70466;
-        --bg-dark: #0a0c10;
-        --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --text-white: #ffffff;
-        --text-dim: #9ca3af;
-        --accent-blue: #3b82f6;
-        --accent-purple: #a855f7;
+        --secondary: #2D2D2D;
+        --bg-dark: #0F0F10;
+        --text-main: #FFFFFF;
+        --text-dim: rgba(255, 255, 255, 0.7);
+        --accent-red: #FF385C;
+    }
+
+    /* Global Styles */
+    .main {
+        background-color: var(--bg-dark);
     }
 
     /* Hide Streamlit default elements */
@@ -47,7 +52,7 @@ GLASS_CSS = """
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stApp {
-        background-color: var(--bg-dark);
+        background-color: transparent !important;
         font-family: 'Outfit', sans-serif;
     }
 
@@ -56,63 +61,71 @@ GLASS_CSS = """
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2 !important;
         overflow: hidden;
         filter: blur(80px);
+        background-color: #0F0F10 !important;
     }
 
     .blob {
         position: absolute;
         border-radius: 50%;
-        opacity: 0.4;
-        animation: move 20s infinite alternate;
+        opacity: 0.4 !important;
+        animation: move 25s infinite alternate;
     }
 
     .blob-1 {
-        width: 400px;
-        height: 400px;
-        background: var(--primary);
-        top: -100px;
-        right: -100px;
+        width: 900px;
+        height: 900px;
+        background: radial-gradient(circle, #FF385C 0%, transparent 70%) !important;
+        top: -250px;
+        right: -250px;
     }
 
     .blob-2 {
-        width: 350px;
-        height: 350px;
-        background: var(--accent-blue);
-        bottom: -50px;
-        left: -50px;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, #3b82f6 0%, transparent 70%) !important;
+        bottom: -200px;
+        left: -200px;
         animation-delay: -5s;
     }
 
     .blob-3 {
-        width: 300px;
-        height: 300px;
-        background: var(--accent-purple);
-        top: 40%;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, #9629f0 0%, transparent 70%) !important;
+        top: 20%;
         left: 30%;
-        animation-delay: -10s;
+        animation-delay: -12s;
     }
 
     @keyframes move {
-        from { transform: translate(0, 0) scale(1); }
-        to { transform: translate(50px, 50px) scale(1.1); }
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(80px, 60px) scale(1.1); }
+        100% { transform: translate(-40px, 30px) scale(1); }
     }
 
     /* Main Container Styles */
+    .block-container {
+        padding-top: 2.5rem !important;
+        max-width: 1000px !important;
+    }
+
     .main-header {
         text-align: center;
-        margin-bottom: 50px;
-        padding-top: 40px;
+        margin-bottom: 15px;
+        padding-top: 0px;
     }
 
     h1 {
-        font-size: 3rem !important;
-        font-weight: 700 !important;
-        margin-bottom: 10px !important;
+        font-size: 4rem !important;
+        font-weight: 800 !important;
+        margin-bottom: 0px !important;
         color: white !important;
+        letter-spacing: -1.5px;
     }
 
     .highlight {
@@ -121,42 +134,81 @@ GLASS_CSS = """
 
     .tagline {
         color: var(--text-dim);
-        font-size: 1.1rem;
-        margin-bottom: 20px;
+        font-size: 1.3rem;
+        font-weight: 400;
+        margin-bottom: 25px;
     }
 
     .stats-bar {
         display: inline-flex;
         align-items: center;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 8px 20px;
-        border-radius: 30px;
-        font-size: 0.9rem;
+        gap: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 8px 25px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 40px;
+        font-size: 1rem;
         color: var(--text-dim);
+        margin-bottom: 30px;
     }
 
     .stat-item {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
     }
 
     .stat-item span {
         color: var(--primary);
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1.1rem;
     }
 
     /* Glassmorphism Cards */
-    .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        margin-bottom: 30px;
+    .glass-card, [data-testid="stVerticalBlockBorderWrapper"] {
+        background: rgba(255, 255, 255, 0.02) !important;
+        backdrop-filter: blur(30px) !important;
+        -webkit-backdrop-filter: blur(30px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 28px !important;
+        padding: 45px !important;
+        box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5) !important;
+        margin-bottom: 40px !important;
+    }
+
+    /* Target the specific search container block to ensure it looks like a card */
+    div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stHorizontalBlock"]) {
+        /* This selector is a bit aggressive but helps style the grouping container */
+    }
+
+    .input-label {
+        color: #FFFFFF;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0.95;
+    }
+
+    /* Button specific styles to match the large red button in reference */
+    .stButton > button {
+        height: 60px !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        background: linear-gradient(90deg, #FF385C, #E23744) !important;
+        border-radius: 16px !important;
+        border: none !important;
+        margin-top: 15px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(255, 56, 92, 0.3) !important;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(255, 56, 92, 0.4) !important;
+        opacity: 0.9 !important;
     }
 
     /* Restaurant Card specific Styles */
@@ -243,12 +295,16 @@ GLASS_CSS = """
 
     .powered-by {
         text-align: center;
-        margin: 40px 0 20px;
-        font-size: 0.85rem;
-        color: var(--text-dim);
-        opacity: 0.6;
-        letter-spacing: 1px;
+        padding: 40px 0;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8) !important;
+        letter-spacing: 3px;
+        font-weight: 700;
         text-transform: uppercase;
+        width: 100%;
+        display: block;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 50px;
     }
 </style>
 """
@@ -262,10 +318,29 @@ BLOBS_HTML = """
 </div>
 """
 
+def check_setup():
+    """Ensures the database is ready for the app."""
+    if not os.path.exists(DATABASE_PATH):
+        st.info("🚀 Welcome! It looks like this is the first time you're running the app.")
+        st.info("Setting up the Zomato Bangalore dataset... this will only take a moment.")
+        
+        with st.spinner("Downloading and processing data..."):
+            try:
+                pipeline = Phase1Pipeline()
+                pipeline.run()
+                st.success("✅ Setup complete! Database is ready.")
+                st.rerun() # Refresh to load the data
+            except Exception as e:
+                st.error(f"Failed to initialize database: {e}")
+                st.stop()
+
 def main():
     # Inject CSS and Background
     st.markdown(GLASS_CSS, unsafe_allow_html=True)
     st.markdown(BLOBS_HTML, unsafe_allow_html=True)
+
+    # Initial Setup Check
+    check_setup()
 
     # Load Data and Models
     validator = InputValidator()
@@ -278,6 +353,7 @@ def main():
         st.session_state.cuisines_list = [c for c in raw_cuisines if c not in ['Cafe', 'Unknown']]
 
     recommender = LLMRecommender()
+    feedback_collector = FeedbackCollector()
 
     # Header Section
     st.markdown(f"""
@@ -293,19 +369,24 @@ def main():
     """, unsafe_allow_html=True)
 
     # Search Form Section
-    with st.container():
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    # We use a container and style it via CSS to avoid the "empty div" issue caused by unclosed HTML blocks
+    search_container = st.container()
+    with search_container:
+        # Row 1: Locality and Price Range
+        row1_col1, row1_col2 = st.columns(2)
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
+        with row1_col1:
+            st.markdown('<div class="input-label">📍 Select locality *</div>', unsafe_allow_html=True)
             city = st.selectbox(
                 "Select locality *",
                 options=[""] + st.session_state.localities,
                 format_func=lambda x: "Select locality..." if x == "" else x,
-                index=0
+                index=0,
+                label_visibility="collapsed"
             )
             
+        with row1_col2:
+            st.markdown('<div class="input-label">💰 Price Range *</div>', unsafe_allow_html=True)
             price_range = st.selectbox(
                 "Price Range *",
                 options=["", "budget", "mid-range", "premium"],
@@ -315,29 +396,36 @@ def main():
                     "mid-range": "Mid-range (₹500 - ₹1500)",
                     "premium": "Premium (₹ > 1500)"
                 }.get(x),
-                index=0
+                index=0,
+                label_visibility="collapsed"
             )
 
-        with col2:
+        # Row 2: Cuisines and Min Rating
+        row2_col1, row2_col2 = st.columns(2)
+
+        with row2_col1:
+            st.markdown('<div class="input-label">🍴 Cuisines (Multi-select)</div>', unsafe_allow_html=True)
             cuisines = st.multiselect(
-                "Cuisines (Optional)",
+                "Cuisines (Multi-select)",
                 options=st.session_state.cuisines_list,
-                placeholder="Select cuisines..."
+                placeholder="Select cuisines...",
+                label_visibility="collapsed"
             )
-            
+
+        with row2_col2:
+            st.markdown('<div class="input-label">⭐ Min Rating</div>', unsafe_allow_html=True)
             min_rating = st.number_input(
                 "Min Rating",
                 min_value=0.0,
                 max_value=5.0,
                 value=0.0,
                 step=0.1,
-                format="%.1f"
+                format="%.1f",
+                label_visibility="collapsed"
             )
 
-        # Submit button
-        submit_clicked = st.button("Get Recommendations ✨")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 25px;"></div>', unsafe_allow_html=True)
+        submit_clicked = st.button("Get Recommendations ✨", use_container_width=True)
 
     # Results Section
     if submit_clicked:
@@ -362,9 +450,8 @@ def main():
                     if engine_response.count == 0:
                         st.info(f"I'm sorry, but I couldn't find any restaurants in {city} matching your criteria.")
                     else:
-                        # Get AI Reasoning Summary (new feature from Phase 6 logic)
-                        from phase6.api_server import generate_ai_summary
-                        ai_summary = generate_ai_summary(user_input, engine_response.recommendations)
+                        # Get AI Reasoning Summary
+                        ai_summary = recommender.generate_ai_summary(user_input, engine_response.recommendations)
                         
                         # Display Summary
                         st.markdown(f"""
@@ -403,9 +490,9 @@ def main():
 
     # Footer
     st.markdown("""
-    <footer class="powered-by">
-        Powered By Groq AI
-    </footer>
+    <div class="powered-by">
+        POWERED BY GROQ AI
+    </div>
     """, unsafe_allow_html=True)
 
 if __name__ == "__main__":

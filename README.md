@@ -39,7 +39,7 @@ An AI-powered restaurant recommendation system that uses the Zomato dataset and 
 
 ### Option 1: Streamlit Dashboard (Recommended)
 ```bash
-streamlit run streamlit_app.py
+python -m streamlit run streamlit_dashboard/app.py
 ```
 
 ### Option 2: FastAPI + Vanilla JS Web App
@@ -55,7 +55,7 @@ Detailed technical architecture can be found in [architecture.md](architecture.m
 
 ## 📂 Project Structure
 
-- `streamlit_app.py`: The Streamlit dashboard entry point.
+- `streamlit_dashboard/app.py`: The Streamlit dashboard entry point.
 - `frontend/`: Web UI files for the FastAPI version (HTML, CSS, JS).
 - `phase6/`: FastAPI server implementation.
 - `phase1-5/`: Core logic modules (Data processing, Validation, Engine, Recommender, Feedback).

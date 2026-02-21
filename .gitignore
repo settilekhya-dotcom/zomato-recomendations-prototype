@@ -12,3 +12,6 @@ dist/
 data/
 zomato.db
 *.csv
+**/secrets.toml
+.venv/
+.gemini/

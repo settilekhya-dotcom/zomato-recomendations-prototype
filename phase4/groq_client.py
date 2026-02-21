@@ -21,9 +21,22 @@ class GroqClient:
             api_key: Groq API key (defaults to GROQ_API_KEY env var)
             model: Model name to use for completions
         """
+        # Try to get API key from various sources:
+        # 1. Explicitly passed argument
+        # 2. Environment variable
+        # 3. Streamlit secrets (for cloud deployment)
         self.api_key = api_key or os.getenv("GROQ_API_KEY")
+        
         if not self.api_key:
-            raise ValueError("Groq API key not found. Please set GROQ_API_KEY in .env file.")
+            try:
+                import streamlit as st
+                if hasattr(st, "secrets"):
+                    self.api_key = st.secrets.get("GROQ_API_KEY")
+            except Exception:
+                pass
+
+        if not self.api_key:
+            raise ValueError("Groq API key not found. Please set GROQ_API_KEY in .env file or Streamlit secrets.")
         
         self.client = Groq(api_key=self.api_key)
         self.model = model

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Any
+from typing import Optional, Any, List
 from phase2.models import UserInput
 from phase3.recommender import RecommendationEngine
 from phase4.groq_client import GroqClient
@@ -69,6 +69,28 @@ class LLMRecommender:
             f"{user_input.min_rating} rating? The restaurant has a rating of {restaurant.rating}, "
             f"serves {restaurant.cuisines}, and costs ₹{restaurant.average_cost} for two. "
             "Provide a short, 1-2 sentence justification starting with 'Why you'll like it:'."
+        )
+        
+        messages = [
+            {"role": "system", "content": "You are a helpful Zomato restaurant expert."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        return self.groq_client.get_completion(messages)
+
+    def generate_ai_summary(self, user_input: UserInput, recommendations: List[Any]) -> str:
+        """
+        Generates a concise AI summary of the recommendations.
+        """
+        if not recommendations:
+            return f"I couldn't find any restaurants in {user_input.city} matching your criteria."
+            
+        restaurant_names = ", ".join([r.name for r in recommendations])
+        prompt = (
+            f"I found {len(recommendations)} great spots in {user_input.city} for you: {restaurant_names}. "
+            f"They match your preference for {user_input.price_range} pricing and {user_input.cuisine or 'various'} cuisines. "
+            "Provide a single, welcoming sentence summarizing why these are good choices. "
+            "Be energetic and helpful."
         )
         
         messages = [
