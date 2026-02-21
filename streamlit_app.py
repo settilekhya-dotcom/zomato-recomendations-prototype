@@ -306,6 +306,69 @@ GLASS_CSS = """
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         margin-top: 50px;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-top: 1.5rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        h1 {
+            font-size: 2.5rem !important;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            flex-direction: column;
+            gap: 5px;
+            padding: 12px 20px;
+            border-radius: 20px;
+            width: 90%;
+            margin-bottom: 20px;
+        }
+
+        .stat-separator {
+            display: none;
+        }
+
+        .glass-card, [data-testid="stVerticalBlockBorderWrapper"] {
+            padding: 25px !important;
+            border-radius: 20px !important;
+            margin-bottom: 25px !important;
+        }
+
+        .input-label {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stButton > button {
+            height: 50px !important;
+            font-size: 1.1rem !important;
+        }
+
+        .res-name {
+            font-size: 1.2rem;
+        }
+
+        .powered-by {
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            padding: 25px 0;
+        }
+        
+        /* Slow down or simplify blobs for mobile performance */
+        .background-blobs {
+            filter: blur(60px);
+        }
+    }
 </style>
 """
 
