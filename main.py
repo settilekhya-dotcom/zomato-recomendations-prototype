@@ -1,10 +1,23 @@
 import sys
-from phase5.main import run_final_app
-from phase6.api_server import app # Entrypoint for Vercel/Deployment
+import uvicorn
+import os
+
+# Ensure the root directory is in the python path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+
+from phase6.api_server import app
 
 if __name__ == "__main__":
     try:
-        run_final_app()
+        # Launch the FastAPI server
+        print("\n" + "="*50)
+        print("Starting Zomato AI Recommender (FastAPI UI)...")
+        print("Visit: http://localhost:8000")
+        print("="*50 + "\n")
+        
+        uvicorn.run("phase6.api_server:app", host="0.0.0.0", port=8000, reload=True)
     except KeyboardInterrupt:
         print("\n\nExiting... Goodbye!")
         sys.exit(0)

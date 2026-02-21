@@ -1,10 +1,11 @@
+pandas
 datasets
 groq
 python-dotenv
 rich
-fastapi
-uvicorn
-httpx
 pydantic
 pydantic-settings
 jinja2
+fastapi
+uvicorn
+httpx

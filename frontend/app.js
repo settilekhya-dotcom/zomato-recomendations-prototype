@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const localities = ['Banashankari', 'Bannerghatta Road', 'Basavanagudi', 'Bellandur', 'Brigade Road', 'Brookefield', 'Btm', 'Church Street', 'Electronic City', 'Frazer Town', 'Hsr', 'Indiranagar', 'Jayanagar', 'Jp Nagar', 'Kalyan Nagar', 'Kammanahalli', 'Koramangala 4Th Block', 'Koramangala 5Th Block', 'Koramangala 6Th Block', 'Koramangala 7Th Block', 'Lavelle Road', 'Malleshwaram', 'Marathahalli', 'Mg Road', 'New Bel Road', 'Old Airport Road', 'Rajajinagar', 'Residency Road', 'Sarjapur Road', 'Whitefield'];
-    const cuisines = ['Afghan', 'Afghani', 'African', 'American', 'Andhra', 'Arabian', 'Asian', 'Assamese', 'Australian', 'Awadhi', 'BBQ', 'Bakery', 'Bar Food', 'Belgian', 'Bengali', 'Beverages', 'Bihari', 'Biryani', 'Bohri', 'British', 'Bubble Tea', 'Burger', 'Burmese', 'Cafe', 'Cantonese', 'Charcoal Chicken', 'Chettinad', 'Chinese', 'Coffee', 'Continental', 'Desserts', 'Drinks Only', 'European', 'Fast Food', 'Finger Food', 'French', 'German', 'Goan', 'Greek', 'Grill', 'Gujarati', 'Healthy Food', 'Hot dogs', 'Hyderabadi', 'Ice Cream', 'Indian', 'Indonesian', 'Iranian', 'Italian', 'Japanese', 'Jewish', 'Juices', 'Kashmiri', 'Kebab', 'Kerala', 'Konkan', 'Korean', 'Lebanese', 'Lucknowi', 'Maharashtrian', 'Malaysian', 'Malwani', 'Mangalorean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Mithai', 'Modern Indian', 'Momos', 'Mongolian', 'Mughlai', 'Naga', 'Nepalese', 'North Eastern', 'North Indian', 'Oriya', 'Paan', 'Pan Asian', 'Parsi', 'Pizza', 'Portuguese', 'Rajasthani', 'Raw Meats', 'Roast Chicken', 'Rolls', 'Russian', 'Salad', 'Sandwich', 'Seafood', 'Sindhi', 'Singaporean', 'South American', 'South Indian', 'Spanish', 'Sri Lankan', 'Steak', 'Street Food', 'Sushi', 'Tamil', 'Tea', 'Tex-Mex', 'Thai', 'Tibetan', 'Turkish', 'Unknown', 'Vegan', 'Vietnamese', 'Wraps'];
+    const cuisinesList = ['Afghan', 'Afghani', 'African', 'American', 'Andhra', 'Arabian', 'Asian', 'Assamese', 'Australian', 'Awadhi', 'BBQ', 'Bakery', 'Bar Food', 'Belgian', 'Bengali', 'Beverages', 'Bihari', 'Biryani', 'Bohri', 'British', 'Bubble Tea', 'Burger', 'Burmese', 'Cafe', 'Cantonese', 'Charcoal Chicken', 'Chettinad', 'Chinese', 'Coffee', 'Continental', 'Desserts', 'Drinks Only', 'European', 'Fast Food', 'Finger Food', 'French', 'German', 'Goan', 'Greek', 'Grill', 'Gujarati', 'Healthy Food', 'Hot dogs', 'Hyderabadi', 'Ice Cream', 'Indian', 'Indonesian', 'Iranian', 'Italian', 'Japanese', 'Jewish', 'Juices', 'Kashmiri', 'Kebab', 'Kerala', 'Konkan', 'Korean', 'Lebanese', 'Lucknowi', 'Maharashtrian', 'Malaysian', 'Malwani', 'Mangalorean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Mithai', 'Modern Indian', 'Momos', 'Mongolian', 'Mughlai', 'Naga', 'Nepalese', 'North Eastern', 'North Indian', 'Oriya', 'Paan', 'Pan Asian', 'Parsi', 'Pizza', 'Portuguese', 'Rajasthani', 'Raw Meats', 'Roast Chicken', 'Rolls', 'Russian', 'Salad', 'Sandwich', 'Seafood', 'Sindhi', 'Singaporean', 'South American', 'South Indian', 'Spanish', 'Sri Lankan', 'Steak', 'Street Food', 'Sushi', 'Tamil', 'Tea', 'Tex-Mex', 'Thai', 'Tibetan', 'Turkish', 'Unknown', 'Vegan', 'Vietnamese', 'Wraps'];
+    const cuisines = cuisinesList.filter(c => c !== 'Cafe' && c !== 'Unknown');
 
     const form = document.getElementById('recommendation-form');
     const resultsGrid = document.getElementById('results-section');
@@ -8,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorCard = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
     const submitBtn = document.getElementById('submit-btn');
+    const localityCount = document.getElementById('locality-count');
+    const cuisineCount = document.getElementById('cuisine-count');
+
+    // Initialize stats
+    if (localityCount) localityCount.textContent = localities.length;
+    if (cuisineCount) cuisineCount.textContent = cuisines.length;
 
     function hideAllDropdowns() {
         cityDropdown.classList.add('hidden');
@@ -28,6 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCityOptions(filter = '') {
         cityOptions.innerHTML = '';
         const filtered = localities.filter(l => l.toLowerCase().includes(filter.toLowerCase()));
+
+        if (filtered.length === 0) {
+            const div = document.createElement('div');
+            div.className = 'option-message';
+            div.textContent = 'No localities found';
+            cityOptions.appendChild(div);
+            return;
+        }
+
         filtered.forEach(l => {
             const div = document.createElement('div');
             div.className = `option ${selectedCity === l ? 'selected' : ''}`;
@@ -61,8 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const isHidden = cityDropdown.classList.contains('hidden');
         hideAllDropdowns();
         if (isHidden) {
+            citySearch.value = '';
+            renderCityOptions();
             cityDropdown.classList.remove('hidden');
             cityDisplay.closest('.form-group').classList.add('active');
+            setTimeout(() => citySearch.focus(), 50);
         }
     });
 
@@ -139,6 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCuisineOptions(filter = '') {
         cuisineOptions.innerHTML = '';
         const filtered = cuisines.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+
+        if (filtered.length === 0) {
+            const div = document.createElement('div');
+            div.className = 'option-message';
+            div.textContent = 'No cuisines found';
+            cuisineOptions.appendChild(div);
+            return;
+        }
+
         filtered.forEach(c => {
             const div = document.createElement('div');
             div.className = `option ${selectedCuisines.includes(c) ? 'selected' : ''}`;
@@ -184,8 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const isHidden = cuisineDropdown.classList.contains('hidden');
         hideAllDropdowns();
         if (isHidden) {
+            cuisineSearch.value = '';
+            renderCuisineOptions();
             cuisineDropdown.classList.remove('hidden');
             cuisineDisplay.closest('.form-group').classList.add('active');
+            setTimeout(() => cuisineSearch.focus(), 50);
         }
     });
 

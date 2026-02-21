@@ -105,6 +105,34 @@ h1 {
 .tagline {
     color: var(--text-dim);
     font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.stats-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 10px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-item span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.stat-separator {
+    opacity: 0.3;
 }
 
 /* Glassmorphism Cards */
@@ -295,6 +323,14 @@ select:focus {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.option-message {
+    padding: 15px 16px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    text-align: center;
+    font-style: italic;
+}
+
 .option.selected {
     color: var(--primary);
     background: rgba(255, 56, 92, 0.1);
@@ -321,6 +357,16 @@ select:focus {
     background: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(255, 56, 92, 0.3);
+}
+
+.powered-by {
+    text-align: center;
+    margin: 40px 0 20px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .results-grid {

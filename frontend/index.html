@@ -24,6 +24,12 @@
             <h1>Zomato AI <span class="highlight">Recommender</span></h1>
             <p class="tagline">Helping you find the best places to eat in <span class="highlight">Bangalore</span> city
             </p>
+            <div class="stats-bar">
+                <span class="stat-item"><i data-lucide="map-pin"></i> <span id="locality-count">0</span>
+                    Localities</span>
+                <span class="stat-separator">|</span>
+                <span class="stat-item"><i data-lucide="utensils"></i> <span id="cuisine-count">0</span> Cuisines</span>
+            </div>
         </header>
 
         <main>
@@ -106,6 +112,9 @@
                 <span id="error-text">Something went wrong.</span>
             </div>
         </main>
+        <footer>
+            <p class="powered-by">Powered By Groq AI</p>
+        </footer>
     </div>
 
     <script src="/static/app.js"></script>
